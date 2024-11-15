@@ -11,7 +11,6 @@ function UILibrary.CreateWindow(title, width, height)
     local Dragging, DragStart, StartPos = false, nil, nil
 
     ScreenGui.Parent = game.CoreGui
-
     local screenWidth = game:GetService("Workspace").CurrentCamera.ViewportSize.X
     local screenHeight = game:GetService("Workspace").CurrentCamera.ViewportSize.Y
 
@@ -21,16 +20,18 @@ function UILibrary.CreateWindow(title, width, height)
 
     MainFrame.Name = "MainFrame"
     MainFrame.Parent = ScreenGui
-    MainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    MainFrame.BackgroundTransparency = 0.3
+    MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    MainFrame.BackgroundTransparency = 0.2
     MainFrame.Size = UDim2.new(0, adjustedWidth, 0, adjustedHeight)
     MainFrame.Position = UDim2.new(0.5, -adjustedWidth / 2, 0.5, -adjustedHeight / 2)
     MainFrame.ClipsDescendants = true
+    MainFrame.BorderSizePixel = 0
 
     TitleBar.Name = "TitleBar"
     TitleBar.Parent = MainFrame
-    TitleBar.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    TitleBar.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
     TitleBar.Size = UDim2.new(1, 0, 0, 30)
+    TitleBar.BorderSizePixel = 0
 
     TitleLabel.Name = "TitleLabel"
     TitleLabel.Parent = TitleBar
@@ -39,7 +40,7 @@ function UILibrary.CreateWindow(title, width, height)
     TitleLabel.Font = Enum.Font.SourceSans
     TitleLabel.Text = title
     TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    TitleLabel.TextSize = 14
+    TitleLabel.TextSize = 18
     TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
     TitleLabel.Position = UDim2.new(0, 10, 0, 0)
 
@@ -47,21 +48,23 @@ function UILibrary.CreateWindow(title, width, height)
     CloseButton.Parent = TitleBar
     CloseButton.Size = UDim2.new(0, 30, 1, 0)
     CloseButton.Position = UDim2.new(1, -35, 0, 0)
-    CloseButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+    CloseButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
     CloseButton.Font = Enum.Font.SourceSans
     CloseButton.Text = "X"
     CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     CloseButton.TextSize = 14
+    CloseButton.BorderSizePixel = 0
 
     HideButton.Name = "HideButton"
     HideButton.Parent = TitleBar
     HideButton.Size = UDim2.new(0, 60, 1, 0)
     HideButton.Position = UDim2.new(1, -70, 0, 0)
-    HideButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+    HideButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     HideButton.Font = Enum.Font.SourceSans
     HideButton.Text = "Hide"
     HideButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     HideButton.TextSize = 14
+    HideButton.BorderSizePixel = 0
 
     ContentFrame.Name = "ContentFrame"
     ContentFrame.Parent = MainFrame
@@ -69,6 +72,7 @@ function UILibrary.CreateWindow(title, width, height)
     ContentFrame.Size = UDim2.new(1, 0, 1, -30)
     ContentFrame.Position = UDim2.new(0, 0, 0, 30)
 
+    -- Make the window draggable
     TitleBar.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
             Dragging = true
@@ -90,10 +94,12 @@ function UILibrary.CreateWindow(title, width, height)
         end
     end)
 
+    -- Close button functionality
     CloseButton.MouseButton1Click:Connect(function()
         ScreenGui:Destroy()
     end)
 
+    -- Hide/Show button functionality
     HideButton.MouseButton1Click:Connect(function()
         if ContentFrame.Visible then
             ContentFrame.Visible = false
@@ -107,54 +113,7 @@ function UILibrary.CreateWindow(title, width, height)
     return {Frame = MainFrame, Content = ContentFrame}
 end
 
-function UILibrary.AddButton(parent, text, callback)
-    local Button = Instance.new("TextButton")
-    Button.Parent = parent
-    Button.Size = UDim2.new(1, 0, 0, 30)
-    Button.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    Button.Font = Enum.Font.SourceSans
-    Button.Text = text
-    Button.TextColor3 = Color3.fromRGB(255, 255, 255)
-    Button.TextSize = 14
-    Button.MouseButton1Click:Connect(callback)
-end
-
-function UILibrary.AddToggle(parent, text, callback)
-    local Toggle = Instance.new("Frame")
-    local Label = Instance.new("TextLabel")
-    local ToggleButton = Instance.new("TextButton")
-    local State = false
-
-    Toggle.Parent = parent
-    Toggle.Size = UDim2.new(1, 0, 0, 30)
-    Toggle.BackgroundTransparency = 1
-
-    Label.Parent = Toggle
-    Label.Size = UDim2.new(0.8, 0, 1, 0)
-    Label.Position = UDim2.new(0, 0, 0, 0)
-    Label.Font = Enum.Font.SourceSans
-    Label.Text = text
-    Label.TextColor3 = Color3.fromRGB(255, 255, 255)
-    Label.TextSize = 14
-    Label.BackgroundTransparency = 1
-
-    ToggleButton.Parent = Toggle
-    ToggleButton.Size = UDim2.new(0.2, 0, 1, 0)
-    ToggleButton.Position = UDim2.new(0.8, 0, 0, 0)
-    ToggleButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-    ToggleButton.Font = Enum.Font.SourceSans
-    ToggleButton.Text = "OFF"
-    ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    ToggleButton.TextSize = 14
-
-    ToggleButton.MouseButton1Click:Connect(function()
-        State = not State
-        ToggleButton.Text = State and "ON" or "OFF"
-        ToggleButton.BackgroundColor3 = State and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(100, 100, 100)
-        callback(State)
-    end)
-end
-
+-- Add Label
 function UILibrary.AddLabel(parent, text)
     local Label = Instance.new("TextLabel")
     Label.Parent = parent
@@ -163,12 +122,64 @@ function UILibrary.AddLabel(parent, text)
     Label.Font = Enum.Font.SourceSans
     Label.Text = text
     Label.TextColor3 = Color3.fromRGB(255, 255, 255)
-    Label.TextSize = 14
+    Label.TextSize = 16
 end
 
+-- Add Button
+function UILibrary.AddButton(parent, text, callback)
+    local Button = Instance.new("TextButton")
+    Button.Parent = parent
+    Button.Size = UDim2.new(1, 0, 0, 30)
+    Button.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    Button.Font = Enum.Font.SourceSans
+    Button.Text = text
+    Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Button.TextSize = 16
+    Button.BorderSizePixel = 0
+    Button.MouseButton1Click:Connect(callback)
+end
+
+-- Add Toggle
+function UILibrary.AddToggle(parent, text, callback)
+    local ToggleFrame = Instance.new("Frame")
+    local ToggleButton = Instance.new("TextButton")
+    local Label = Instance.new("TextLabel")
+    local State = false
+
+    ToggleFrame.Parent = parent
+    ToggleFrame.Size = UDim2.new(1, 0, 0, 30)
+    ToggleFrame.BackgroundTransparency = 1
+
+    Label.Parent = ToggleFrame
+    Label.Size = UDim2.new(0.7, 0, 1, 0)
+    Label.Position = UDim2.new(0, 10, 0, 0)
+    Label.Font = Enum.Font.SourceSans
+    Label.Text = text
+    Label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Label.TextSize = 16
+    Label.BackgroundTransparency = 1
+
+    ToggleButton.Parent = ToggleFrame
+    ToggleButton.Size = UDim2.new(0.3, 0, 1, 0)
+    ToggleButton.Position = UDim2.new(0.7, 0, 0, 0)
+    ToggleButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    ToggleButton.Text = "OFF"
+    ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    ToggleButton.TextSize = 16
+    ToggleButton.BorderSizePixel = 0
+
+    ToggleButton.MouseButton1Click:Connect(function()
+        State = not State
+        ToggleButton.Text = State and "ON" or "OFF"
+        ToggleButton.BackgroundColor3 = State and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(50, 50, 50)
+        callback(State)
+    end)
+end
+
+-- Add Dropdown
 function UILibrary.AddDropdown(parent, text, options, callback)
     local Dropdown = Instance.new("Frame")
-    local DropButton = Instance.new("TextButton")
+    local Button = Instance.new("TextButton")
     local OptionFrame = Instance.new("Frame")
     local Layout = Instance.new("UIListLayout")
 
@@ -176,42 +187,55 @@ function UILibrary.AddDropdown(parent, text, options, callback)
     Dropdown.Size = UDim2.new(1, 0, 0, 30)
     Dropdown.BackgroundTransparency = 1
 
-    DropButton.Parent = Dropdown
-    DropButton.Size = UDim2.new(1, 0, 1, 0)
-    DropButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    DropButton.Font = Enum.Font.SourceSans
-    DropButton.Text = text
-    DropButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    DropButton.TextSize = 14
+    Button.Parent = Dropdown
+    Button.Size = UDim2.new(1, 0, 0, 30)
+    Button.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    Button.Font = Enum.Font.SourceSans
+    Button.Text = text
+    Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Button.TextSize = 16
+    Button.BorderSizePixel = 0
 
     OptionFrame.Parent = Dropdown
-    OptionFrame.Position = UDim2.new(0, 0, 1, 0)
-    OptionFrame.Size = UDim2.new(1, 0, 0, #options * 30)
-    OptionFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30) OptionFrame.BackgroundTransparency = 0.5
+    OptionFrame.Size = UDim2.new(1, 0, 0, 0)
+    OptionFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    OptionFrame.BackgroundTransparency = 0.8
     OptionFrame.Visible = false
 
     Layout.Parent = OptionFrame
     Layout.SortOrder = Enum.SortOrder.LayoutOrder
+    Layout.Padding = UDim(0, 5)
 
     for _, option in pairs(options) do
-        local Option = Instance.new("TextButton")
-        Option.Parent = OptionFrame
-        Option.Size = UDim2.new(1, 0, 0, 30)
-        Option.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-        Option.Font = Enum.Font.SourceSans
-        Option.Text = option
-        Option.TextColor3 = Color3.fromRGB(255, 255, 255)
-        Option.TextSize = 14
-        Option.MouseButton1Click:Connect(function()
-            DropButton.Text = option
+        local OptionButton = Instance.new("TextButton")
+        OptionButton.Parent = OptionFrame
+        OptionButton.Size = UDim2.new(1, 0, 0, 30)
+        OptionButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+        OptionButton.Font = Enum.Font.SourceSans
+        OptionButton.Text = option
+        OptionButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        OptionButton.TextSize = 16
+        OptionButton.BorderSizePixel = 0
+
+        OptionButton.MouseButton1Click:Connect(function()
+            Button.Text = option
             OptionFrame.Visible = false
             callback(option)
         end)
     end
 
-    DropButton.MouseButton1Click:Connect(function()
+    Button.MouseButton1Click:Connect(function()
         OptionFrame.Visible = not OptionFrame.Visible
     end)
+
+    -- Close the dropdown if clicked outside
+    game:GetService("UserInputService").InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 and not Dropdown:GetAbsBounds():Contains(input.Position) then
+            OptionFrame.Visible = false
+        end
+    end)
+
+    return Dropdown
 end
 
 return UILibrary
