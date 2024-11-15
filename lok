@@ -6,7 +6,7 @@ function UILibrary.CreateWindow(title, width, height)
     local TitleBar = Instance.new("Frame")
     local TitleLabel = Instance.new("TextLabel")
     local CloseButton = Instance.new("TextButton")
-    local MinimizeButton = Instance.new("TextButton")
+    local HideButton = Instance.new("TextButton")
     local ContentFrame = Instance.new("Frame")
     local Dragging, DragStart, StartPos = false, nil, nil
 
@@ -46,15 +46,15 @@ function UILibrary.CreateWindow(title, width, height)
     CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     CloseButton.TextSize = 18
 
-    MinimizeButton.Name = "MinimizeButton"
-    MinimizeButton.Parent = TitleBar
-    MinimizeButton.Size = UDim2.new(0, 30, 1, 0)
-    MinimizeButton.Position = UDim2.new(1, -70, 0, 0)
-    MinimizeButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-    MinimizeButton.Font = Enum.Font.SourceSans
-    MinimizeButton.Text = "_"
-    MinimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    MinimizeButton.TextSize = 18
+    HideButton.Name = "HideButton"
+    HideButton.Parent = TitleBar
+    HideButton.Size = UDim2.new(0, 60, 1, 0)
+    HideButton.Position = UDim2.new(1, -70, 0, 0)
+    HideButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+    HideButton.Font = Enum.Font.SourceSans
+    HideButton.Text = "Hide"
+    HideButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    HideButton.TextSize = 18
 
     ContentFrame.Name = "ContentFrame"
     ContentFrame.Parent = MainFrame
@@ -87,14 +87,14 @@ function UILibrary.CreateWindow(title, width, height)
         ScreenGui:Destroy()
     end)
 
-    local Minimized = false
-    MinimizeButton.MouseButton1Click:Connect(function()
-        if Minimized then
-            MainFrame.Size = UDim2.new(0, width, 0, height)
+    HideButton.MouseButton1Click:Connect(function()
+        if ContentFrame.Visible then
+            ContentFrame.Visible = false
+            HideButton.Text = "Show"
         else
-            MainFrame.Size = UDim2.new(0, width, 0, 30)
+            ContentFrame.Visible = true
+            HideButton.Text = "Hide"
         end
-        Minimized = not Minimized
     end)
 
     return {Frame = MainFrame, Content = ContentFrame}
@@ -194,7 +194,7 @@ function UILibrary.AddDropdown(parent, text, options, callback)
         Option.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
         Option.Font = Enum.Font.SourceSans
         Option.Text = option
-        Option.TextColor3 = Color3.fromRGB(255, 255, 255)
+Option.TextColor3 = Color3.fromRGB(255, 255, 255)
         Option.TextSize = 18
         Option.MouseButton1Click:Connect(function()
             DropButton.Text = option
