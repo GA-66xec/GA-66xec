@@ -10,6 +10,7 @@ function UILibrary.CreateWindow(title, width, height)
     local ContentFrame = Instance.new("Frame")
     local Dragging, DragStart, StartPos = false, nil, nil
 
+    -- Create the main ScreenGui
     ScreenGui.Parent = game.CoreGui
     local screenWidth = game:GetService("Workspace").CurrentCamera.ViewportSize.X
     local screenHeight = game:GetService("Workspace").CurrentCamera.ViewportSize.Y
@@ -18,21 +19,26 @@ function UILibrary.CreateWindow(title, width, height)
     local adjustedWidth = math.min(width, screenWidth * 0.8)
     local adjustedHeight = math.min(height, screenHeight * 0.8)
 
+    -- Main Window Frame
     MainFrame.Name = "MainFrame"
     MainFrame.Parent = ScreenGui
-    MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20) -- Jet black background
     MainFrame.BackgroundTransparency = 0.2
     MainFrame.Size = UDim2.new(0, adjustedWidth, 0, adjustedHeight)
     MainFrame.Position = UDim2.new(0.5, -adjustedWidth / 2, 0.5, -adjustedHeight / 2)
     MainFrame.ClipsDescendants = true
-    MainFrame.BorderSizePixel = 0
+    MainFrame.BorderSizePixel = 2
+    MainFrame.BorderColor3 = Color3.fromRGB(50, 50, 50) -- Frame border
 
+    -- Title Bar (Draggable part)
     TitleBar.Name = "TitleBar"
     TitleBar.Parent = MainFrame
-    TitleBar.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    TitleBar.BackgroundColor3 = Color3.fromRGB(30, 30, 30) -- Jet black
     TitleBar.Size = UDim2.new(1, 0, 0, 30)
-    TitleBar.BorderSizePixel = 0
+    TitleBar.BorderSizePixel = 2
+    TitleBar.BorderColor3 = Color3.fromRGB(50, 50, 50) -- Frame border
 
+    -- Title Label
     TitleLabel.Name = "TitleLabel"
     TitleLabel.Parent = TitleBar
     TitleLabel.BackgroundTransparency = 1
@@ -44,28 +50,20 @@ function UILibrary.CreateWindow(title, width, height)
     TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
     TitleLabel.Position = UDim2.new(0, 10, 0, 0)
 
-    CloseButton.Name = "CloseButton"
-    CloseButton.Parent = TitleBar
-    CloseButton.Size = UDim2.new(0, 30, 1, 0)
-    CloseButton.Position = UDim2.new(1, -35, 0, 0)
-    CloseButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-    CloseButton.Font = Enum.Font.SourceSans
-    CloseButton.Text = "X"
-    CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    CloseButton.TextSize = 14
-    CloseButton.BorderSizePixel = 0
-
+    -- Hide Button (top-right of the screen)
     HideButton.Name = "HideButton"
-    HideButton.Parent = TitleBar
-    HideButton.Size = UDim2.new(0, 60, 1, 0)
-    HideButton.Position = UDim2.new(1, -70, 0, 0)
+    HideButton.Parent = ScreenGui
+    HideButton.Size = UDim2.new(0, 60, 0, 30)
+    HideButton.Position = UDim2.new(1, -70, 0, 10)
     HideButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     HideButton.Font = Enum.Font.SourceSans
     HideButton.Text = "Hide"
     HideButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     HideButton.TextSize = 14
-    HideButton.BorderSizePixel = 0
+    HideButton.BorderSizePixel = 2
+    HideButton.BorderColor3 = Color3.fromRGB(50, 50, 50)
 
+    -- Content Frame for holding UI elements (buttons, toggles, etc.)
     ContentFrame.Name = "ContentFrame"
     ContentFrame.Parent = MainFrame
     ContentFrame.BackgroundTransparency = 1
@@ -94,23 +92,20 @@ function UILibrary.CreateWindow(title, width, height)
         end
     end)
 
-    -- Close button functionality
-    CloseButton.MouseButton1Click:Connect(function()
-        ScreenGui:Destroy()
-    end)
-
-    -- Hide/Show button functionality
+    -- Hide/Show Button functionality
+    local isVisible = true
     HideButton.MouseButton1Click:Connect(function()
-        if ContentFrame.Visible then
-            ContentFrame.Visible = false
+        if isVisible then
+            MainFrame.Visible = false
             HideButton.Text = "Show"
         else
-            ContentFrame.Visible = true
+            MainFrame.Visible = true
             HideButton.Text = "Hide"
         end
+        isVisible = not isVisible
     end)
 
-    return {Frame = MainFrame, Content = ContentFrame}
+    return {Frame = MainFrame, Content = ContentFrame, HideButton = HideButton}
 end
 
 -- Add Label
@@ -118,11 +113,15 @@ function UILibrary.AddLabel(parent, text)
     local Label = Instance.new("TextLabel")
     Label.Parent = parent
     Label.Size = UDim2.new(1, 0, 0, 30)
-    Label.BackgroundTransparency = 1
+    Label.BackgroundColor3 = Color3.fromRGB(20, 20, 20) -- Jet black background
+    Label.BackgroundTransparency = 0.2
     Label.Font = Enum.Font.SourceSans
     Label.Text = text
     Label.TextColor3 = Color3.fromRGB(255, 255, 255)
     Label.TextSize = 16
+    Label.TextXAlignment = Enum.TextXAlignment.Left
+    Label.BorderSizePixel = 2
+    Label.BorderColor3 = Color3.fromRGB(50, 50, 50) -- Frame border
 end
 
 -- Add Button
@@ -130,12 +129,14 @@ function UILibrary.AddButton(parent, text, callback)
     local Button = Instance.new("TextButton")
     Button.Parent = parent
     Button.Size = UDim2.new(1, 0, 0, 30)
-    Button.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    Button.BackgroundColor3 = Color3.fromRGB(20, 20, 20) -- Jet black background
+    Button.BackgroundTransparency = 0.2
     Button.Font = Enum.Font.SourceSans
     Button.Text = text
     Button.TextColor3 = Color3.fromRGB(255, 255, 255)
     Button.TextSize = 16
-    Button.BorderSizePixel = 0
+    Button.BorderSizePixel = 2
+    Button.BorderColor3 = Color3.fromRGB(50, 50, 50) -- Frame border
     Button.MouseButton1Click:Connect(callback)
 end
 
@@ -166,7 +167,8 @@ function UILibrary.AddToggle(parent, text, callback)
     ToggleButton.Text = "OFF"
     ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     ToggleButton.TextSize = 16
-    ToggleButton.BorderSizePixel = 0
+    ToggleButton.BorderSizePixel = 2
+    ToggleButton.BorderColor3 = Color3.fromRGB(50, 50, 50)
 
     ToggleButton.MouseButton1Click:Connect(function()
         State = not State
@@ -178,18 +180,21 @@ end
 
 -- Add Dropdown
 function UILibrary.AddDropdown(parent, text, options, callback)
-    local Dropdown = Instance.new("Frame")
+local Dropdown = Instance.new("Frame")
     local Button = Instance.new("TextButton")
     local OptionFrame = Instance.new("Frame")
     local Layout = Instance.new("UIListLayout")
 
     Dropdown.Parent = parent
-    Dropdown.Size = UDim2.new(1, 0, 0, 30)
-    Dropdown.BackgroundTransparency = 1
+    Dropdown.Size = UDim2.new(1, 0, 0, 40)
+    Dropdown.BackgroundColor3 = Color3.fromRGB(20, 20, 20)  -- Jet black background
+    Dropdown.BackgroundTransparency = 0.2
+    Dropdown.BorderSizePixel = 2
+    Dropdown.BorderColor3 = Color3.fromRGB(50, 50, 50)  -- Border color
 
     Button.Parent = Dropdown
     Button.Size = UDim2.new(1, 0, 0, 30)
-    Button.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    Button.BackgroundColor3 = Color3.fromRGB(20, 20, 20)  -- Jet black
     Button.Font = Enum.Font.SourceSans
     Button.Text = text
     Button.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -198,9 +203,12 @@ function UILibrary.AddDropdown(parent, text, options, callback)
 
     OptionFrame.Parent = Dropdown
     OptionFrame.Size = UDim2.new(1, 0, 0, 0)
-    OptionFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-    OptionFrame.BackgroundTransparency = 0.8
+    OptionFrame.Position = UDim2.new(0, 0, 0, 30)  -- Dropdown options appear below the button
+    OptionFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)  -- Jet black background
+    OptionFrame.BackgroundTransparency = 0.2
     OptionFrame.Visible = false
+    OptionFrame.BorderSizePixel = 2
+    OptionFrame.BorderColor3 = Color3.fromRGB(50, 50, 50)  -- Border color
 
     Layout.Parent = OptionFrame
     Layout.SortOrder = Enum.SortOrder.LayoutOrder
@@ -210,7 +218,7 @@ function UILibrary.AddDropdown(parent, text, options, callback)
         local OptionButton = Instance.new("TextButton")
         OptionButton.Parent = OptionFrame
         OptionButton.Size = UDim2.new(1, 0, 0, 30)
-        OptionButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+        OptionButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)  -- Darker black
         OptionButton.Font = Enum.Font.SourceSans
         OptionButton.Text = option
         OptionButton.TextColor3 = Color3.fromRGB(255, 255, 255)
