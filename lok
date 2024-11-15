@@ -1,265 +1,132 @@
-local UILibrary = {}
+-- KTMHub UI Library Module
 
-function UILibrary.CreateWindow(title, width, height)
-    local ScreenGui = Instance.new("ScreenGui")
-    local MainFrame = Instance.new("Frame")
-    local TitleBar = Instance.new("Frame")
-    local TitleLabel = Instance.new("TextLabel")
-    local CloseButton = Instance.new("TextButton")
-    local ContentFrame = Instance.new("Frame")
-    local Dragging, DragStart, StartPos = false, nil, nil
-    local IsVisible = true  -- Track visibility
+local UserInputService = game:GetService("UserInputService")
 
-    ScreenGui.Parent = game.CoreGui
-    local screenWidth = game:GetService("Workspace").CurrentCamera.ViewportSize.X
-    local screenHeight = game:GetService("Workspace").CurrentCamera.ViewportSize.Y
+local KTMHub = {}
 
-    -- Adjust window size based on screen size
-    local adjustedWidth = math.min(width, screenWidth * 0.8)
-    local adjustedHeight = math.min(height, screenHeight * 0.8)
-
-    -- Main window frame setup
-    MainFrame.Name = "MainFrame"
-    MainFrame.Parent = ScreenGui
-    MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-    MainFrame.BackgroundTransparency = 0.2
-    MainFrame.Size = UDim2.new(0, adjustedWidth, 0, adjustedHeight)
-    MainFrame.Position = UDim2.new(0.5, -adjustedWidth / 2, 0.5, -adjustedHeight / 2)
-    MainFrame.ClipsDescendants = true
-    MainFrame.BorderSizePixel = 0
-
-    -- Title bar setup
-    TitleBar.Name = "TitleBar"
-    TitleBar.Parent = MainFrame
-    TitleBar.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    TitleBar.Size = UDim2.new(1, 0, 0, 30)
-    TitleBar.BorderSizePixel = 0
-
-    -- Title label setup
-    TitleLabel.Name = "TitleLabel"
-    TitleLabel.Parent = TitleBar
-    TitleLabel.BackgroundTransparency = 1
-    TitleLabel.Size = UDim2.new(1, -60, 1, 0)
-    TitleLabel.Font = Enum.Font.SourceSans
-    TitleLabel.Text = title
-    TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    TitleLabel.TextSize = 18
-    TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
-    TitleLabel.Position = UDim2.new(0, 10, 0, 0)
-
-    -- Close button setup
-    CloseButton.Name = "CloseButton"
-    CloseButton.Parent = TitleBar
-    CloseButton.Size = UDim2.new(0, 30, 1, 0)
-    CloseButton.Position = UDim2.new(1, -35, 0, 0)
-    CloseButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-    CloseButton.Font = Enum.Font.SourceSans
-    CloseButton.Text = "X"
-    CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    CloseButton.TextSize = 14
-    CloseButton.BorderSizePixel = 0
-
-    -- Content frame setup
-    ContentFrame.Name = "ContentFrame"
-    ContentFrame.Parent = MainFrame
-    ContentFrame.BackgroundTransparency = 1
-    ContentFrame.Size = UDim2.new(1, 0, 1, -30)
-    ContentFrame.Position = UDim2.new(0, 0, 0, 30)
-
-    -- Dragging functionality for the window
-    TitleBar.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            Dragging = true
-            DragStart = input.Position
-            StartPos = MainFrame.Position
-        end
-    end)
-
-    TitleBar.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            Dragging = false
-        end
-    end)
-
-    game:GetService("UserInputService").InputChanged:Connect(function(input)
-        if Dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-            local Delta = input.Position - DragStart
-            MainFrame.Position = UDim2.new(StartPos.X.Scale, StartPos.X.Offset + Delta.X, StartPos.Y.Scale, StartPos.Y.Offset + Delta.Y)
-        end
-    end)
-
-    -- Close button functionality
-    CloseButton.MouseButton1Click:Connect(function()
-        ScreenGui:Destroy()
-    end)
-
-    return {Frame = MainFrame, Content = ContentFrame}
+-- Create a new ScreenGui
+function KTMHub:createScreenGui()
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Name = "CustomGUI"
+    screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+    return screenGui
 end
 
--- Create Hide Button on the screen (not in the window)
-function UILibrary.CreateHideButton()
-    local HideButton = Instance.new("TextButton")
-    HideButton.Parent = game.CoreGui
-    HideButton.Size = UDim2.new(0, 60, 0, 30)
-    HideButton.Position = UDim2.new(1, -70, 0, 10)  -- Position at top-right
-    HideButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    HideButton.Font = Enum.Font.SourceSans
-    HideButton.Text = "Hide"
-    HideButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    HideButton.TextSize = 16
-    HideButton.BorderSizePixel = 0
+-- Create a frame with a background color and rounded corners
+function KTMHub:createFrame(parent, size, position, color, transparency)
+    local frame = Instance.new("Frame")
+    frame.Size = size
+    frame.Position = position
+    frame.BackgroundColor3 = color
+    frame.BackgroundTransparency = transparency
+    frame.BorderSizePixel = 1
+    frame.BorderColor3 = Color3.fromRGB(255, 255, 255)
+    frame.Parent = parent
 
-    -- Track the window's visibility
-    local IsVisible = true
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 12)
+    corner.Parent = frame
 
-    HideButton.MouseButton1Click:Connect(function()
-        if IsVisible then
-            for _, screenGui in ipairs(game.CoreGui:GetChildren()) do
-                if screenGui:FindFirstChild("MainFrame") then
-                    screenGui.MainFrame.Visible = false  -- Hide window
-                end
-            end
-            HideButton.Text = "Show"
-        else
-            for _, screenGui in ipairs(game.CoreGui:GetChildren()) do
-                if screenGui:FindFirstChild("MainFrame") then
-                    screenGui.MainFrame.Visible = true  -- Show window
-                end
-            end
-            HideButton.Text = "Hide"
-        end
-        IsVisible = not IsVisible
+    return frame
+end
+
+-- Create a TextLabel with rounded corners
+function KTMHub:createTextLabel(parent, size, position, text, font, textSize, color)
+    local label = Instance.new("TextLabel")
+    label.Size = size
+    label.Position = position
+    label.BackgroundTransparency = 1
+    label.Text = text
+    label.TextColor3 = color
+    label.Font = font
+    label.TextSize = textSize
+    label.Parent = parent
+    return label
+end
+
+-- Create a TextButton with rounded corners
+function KTMHub:createTextButton(parent, size, position, text, font, textSize, color, transparency)
+    local button = Instance.new("TextButton")
+    button.Size = size
+    button.Position = position
+    button.BackgroundColor3 = color
+    button.BackgroundTransparency = transparency
+    button.Text = text
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    button.Font = font
+    button.TextSize = textSize
+    button.Parent = parent
+
+    local buttonCorner = Instance.new("UICorner")
+    buttonCorner.CornerRadius = UDim.new(0, 8)
+    buttonCorner.Parent = button
+
+    return button
+end
+
+-- Create a Toggle button with rounded corners
+function KTMHub:createToggle(parent, size, position, text, callback)
+    local toggleButton = KTMHub:createTextButton(parent, size, position, text, Enum.Font.SourceSansBold, 18, Color3.fromRGB(0, 0, 0), 0.5)
+    toggleButton.MouseButton1Click:Connect(function()
+        toggleButton.BackgroundTransparency = toggleButton.BackgroundTransparency == 0.5 and 0 or 0.5
+        callback(toggleButton.BackgroundTransparency == 0)
     end)
-
-    return HideButton
+    return toggleButton
 end
 
--- Add Label to Content Frame
-function UILibrary.AddLabel(parent, text)
-    local Label = Instance.new("TextLabel")
-    Label.Parent = parent
-    Label.Size = UDim2.new(1, 0, 0, 30)
-    Label.BackgroundTransparency = 1
-    Label.Font = Enum.Font.SourceSans
-    Label.Text = text
-    Label.TextColor3 = Color3.fromRGB(255, 255, 255)
-    Label.TextSize = 16
-end
+-- Create a Dropdown menu with a button to toggle visibility and a list of options
+function KTMHub:createDropdown(parent, size, position, options, callback)
+    local dropdownFrame = KTMHub:createFrame(parent, size, position, Color3.fromRGB(0, 0, 0), 0.5)
+    local dropdownButton = KTMHub:createTextButton(dropdownFrame, UDim2.new(1, 0, 0, 40), UDim2.new(0, 0, 0, 0), "Select Option", Enum.Font.SourceSansBold, 18, Color3.fromRGB(0, 0, 0), 0.5)
 
--- Add Button to Content Frame
-function UILibrary.AddButton(parent, text, callback)
-    local Button = Instance.new("TextButton")
-    Button.Parent = parent
-    Button.Size = UDim2.new(1, 0, 0, 30)
-    Button.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-    Button.Font = Enum.Font.SourceSans
-    Button.Text = text
-    Button.TextColor3 = Color3.fromRGB(255, 255, 255)
-    Button.TextSize = 16
-    Button.BorderSizePixel = 0
-    Button.MouseButton1Click:Connect(callback)
-end
+    local optionsFrame = KTMHub:createFrame(dropdownFrame, UDim2.new(1, 0, 0, #options * 40), UDim2.new(0, 0, 0, 40), Color3.fromRGB(0, 0, 0), 0.5)
+    optionsFrame.Visible = false
 
--- Add Toggle to Content Frame
-function UILibrary.AddToggle(parent, text, callback)
-    local ToggleFrame = Instance.new("Frame")
-    local ToggleButton = Instance.new("TextButton")
-    local Label = Instance.new("TextLabel")
-    local State = false
-
-    ToggleFrame.Parent = parent
-    ToggleFrame.Size = UDim2.new(1, 0, 0, 30)
-    ToggleFrame.BackgroundTransparency = 1
-
-    Label.Parent = ToggleFrame
-    Label.Size = UDim2.new(0.7, 0, 1, 0)
-    Label.Position = UDim2.new(0, 10, 0, 0)
-    Label.Font = Enum.Font.SourceSans
-    Label.Text = text
-    Label.TextColor3 = Color3.fromRGB(255, 255, 255)
-    Label.TextSize = 16
-    Label.BackgroundTransparency = 1
-
-    ToggleButton.Parent = ToggleFrame
-    ToggleButton.Size = UDim2.new(0.3, 0, 1, 0)
-    ToggleButton.Position = UDim2.new(0.7, 0, 0, 0)
-    ToggleButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    ToggleButton.Text = "OFF"
-    ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    ToggleButton.TextSize = 16
-    ToggleButton.BorderSizePixel = 0
-
-    ToggleButton.MouseButton1Click:Connect(function()
-        State = not State
-        ToggleButton.Text = State and "ON" or "OFF"
-        ToggleButton.BackgroundColor3 = State and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(50, 50, 50)
-        callback(State)
-    end)
-
-    return ToggleFrame
-end
-
--- Add Dropdown to Content Frame
-function UILibrary.AddDropdown(parent, text, options, callback)
-    local Dropdown = Instance.new("Frame")
-    local Button = Instance.new("TextButton")
-    local OptionFrame = Instance.new("Frame")
-    local Layout = Instance.new("UIListLayout")
-    local IsOpen = false
-
-    Dropdown.Parent = parent
-    Dropdown.Size = UDim2.new(1, 0, 0, 30)
-    Dropdown.BackgroundTransparency = 1
-
-    Button.Parent = Dropdown
-    Button.Size = UDim2.new(1, 0, 0, 30)
-    Button.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-    Button.Font = Enum.Font.SourceSans
-    Button.Text = text
-    Button.TextColor3 = Color3.fromRGB(255, 255, 255)
-    Button.TextSize = 16
-    Button.BorderSizePixel = 0
-
-    OptionFrame.Parent = Dropdown
-    OptionFrame.Size = UDim2.new(1, 0, 0, 0)
-    OptionFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-    OptionFrame.BackgroundTransparency = 0.8
-    OptionFrame.Visible = false
-
-    Layout.Parent = OptionFrame
-    Layout.SortOrder = Enum.SortOrder.LayoutOrder
-    Layout.Padding = UDim(0, 5)
-
-    for _, option in ipairs(options) do
-        local OptionButton = Instance.new("TextButton")
-        OptionButton.Parent = OptionFrame
-        OptionButton.Size = UDim2.new(1, 0, 0, 30)
-        OptionButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-        OptionButton.Font = Enum.Font.SourceSans
-        OptionButton.Text = option
-        OptionButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-        OptionButton.TextSize = 16
-        OptionButton.BorderSizePixel = 0
-
-        OptionButton.MouseButton1Click:Connect(function()
-            Button.Text = option
-            OptionFrame.Visible = false
+    -- Create option buttons for each dropdown option
+    for i, option in ipairs(options) do
+        local optionButton = KTMHub:createTextButton(optionsFrame, UDim2.new(1, 0, 0, 40), UDim2.new(0, 0, 0, (i - 1) * 40), option, Enum.Font.SourceSans, 18, Color3.fromRGB(0, 0, 0), 0.5)
+        optionButton.MouseButton1Click:Connect(function()
             callback(option)
+            optionsFrame.Visible = false
+            dropdownButton.Text = option
         end)
     end
 
-    Button.MouseButton1Click:Connect(function()
-        OptionFrame.Visible = not OptionFrame.Visible
+    -- Toggle the dropdown visibility
+    dropdownButton.MouseButton1Click:Connect(function()
+        optionsFrame.Visible = not optionsFrame.Visible
     end)
 
-    -- Close the dropdown if clicked outside
-    game:GetService("UserInputService").InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 and not Dropdown:GetAbsBounds():Contains(input.Position) then
-            OptionFrame.Visible = false
-        end
-    end)
-
-    return Dropdown
+    return dropdownButton
 end
 
-return UILibrary
+-- Create a Tab system
+function KTMHub:createTabs(parent, tabs, defaultTab, contentCallback)
+    local tabPanel = KTMHub:createFrame(parent, UDim2.new(0, 120, 1, -40), UDim2.new(0, 0, 0, 40), Color3.fromRGB(0, 0, 0), 0.5)
+    local tabButtons = {}
+
+    -- Create tab buttons
+    for i, tabName in ipairs(tabs) do
+        local button = KTMHub:createTextButton(tabPanel, UDim2.new(1, 0, 0, 30), UDim2.new(0, 0, 0, (i - 1) * 30), tabName, Enum.Font.SourceSans, 18, Color3.fromRGB(0, 0, 0), 0.5)
+        tabButtons[tabName] = button
+        button.MouseButton1Click:Connect(function()
+            contentCallback(tabName)
+            -- Change tab button color
+            for _, btn in pairs(tabButtons) do
+                btn.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+            end
+            button.BackgroundColor3 = Color3.fromRGB(0, 0, 180)
+        end)
+
+        -- Add rounded corners to each button
+        local buttonCorner = Instance.new("UICorner")
+        buttonCorner.CornerRadius = UDim.new(0, 8)
+        buttonCorner.Parent = button
+    end
+
+    -- Set default tab
+    tabButtons[defaultTab].BackgroundColor3 = Color3.fromRGB(0, 0, 180)
+    contentCallback(defaultTab)
+end
+
+return KTMHub
