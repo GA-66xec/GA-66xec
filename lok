@@ -12,12 +12,19 @@ function UILibrary.CreateWindow(title, width, height)
 
     ScreenGui.Parent = game.CoreGui
 
+    local screenWidth = game:GetService("Workspace").CurrentCamera.ViewportSize.X
+    local screenHeight = game:GetService("Workspace").CurrentCamera.ViewportSize.Y
+
+    -- Adjust window size based on screen size
+    local adjustedWidth = math.min(width, screenWidth * 0.8)
+    local adjustedHeight = math.min(height, screenHeight * 0.8)
+
     MainFrame.Name = "MainFrame"
     MainFrame.Parent = ScreenGui
     MainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
     MainFrame.BackgroundTransparency = 0.3
-    MainFrame.Size = UDim2.new(0, width, 0, height)
-    MainFrame.Position = UDim2.new(0.5, -width / 2, 0.5, -height / 2)
+    MainFrame.Size = UDim2.new(0, adjustedWidth, 0, adjustedHeight)
+    MainFrame.Position = UDim2.new(0.5, -adjustedWidth / 2, 0.5, -adjustedHeight / 2)
     MainFrame.ClipsDescendants = true
 
     TitleBar.Name = "TitleBar"
@@ -32,7 +39,7 @@ function UILibrary.CreateWindow(title, width, height)
     TitleLabel.Font = Enum.Font.SourceSans
     TitleLabel.Text = title
     TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    TitleLabel.TextSize = 18
+    TitleLabel.TextSize = 14
     TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
     TitleLabel.Position = UDim2.new(0, 10, 0, 0)
 
@@ -44,7 +51,7 @@ function UILibrary.CreateWindow(title, width, height)
     CloseButton.Font = Enum.Font.SourceSans
     CloseButton.Text = "X"
     CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    CloseButton.TextSize = 18
+    CloseButton.TextSize = 14
 
     HideButton.Name = "HideButton"
     HideButton.Parent = TitleBar
@@ -54,7 +61,7 @@ function UILibrary.CreateWindow(title, width, height)
     HideButton.Font = Enum.Font.SourceSans
     HideButton.Text = "Hide"
     HideButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    HideButton.TextSize = 18
+    HideButton.TextSize = 14
 
     ContentFrame.Name = "ContentFrame"
     ContentFrame.Parent = MainFrame
@@ -108,7 +115,7 @@ function UILibrary.AddButton(parent, text, callback)
     Button.Font = Enum.Font.SourceSans
     Button.Text = text
     Button.TextColor3 = Color3.fromRGB(255, 255, 255)
-    Button.TextSize = 18
+    Button.TextSize = 14
     Button.MouseButton1Click:Connect(callback)
 end
 
@@ -128,7 +135,7 @@ function UILibrary.AddToggle(parent, text, callback)
     Label.Font = Enum.Font.SourceSans
     Label.Text = text
     Label.TextColor3 = Color3.fromRGB(255, 255, 255)
-    Label.TextSize = 18
+    Label.TextSize = 14
     Label.BackgroundTransparency = 1
 
     ToggleButton.Parent = Toggle
@@ -138,7 +145,7 @@ function UILibrary.AddToggle(parent, text, callback)
     ToggleButton.Font = Enum.Font.SourceSans
     ToggleButton.Text = "OFF"
     ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    ToggleButton.TextSize = 18
+    ToggleButton.TextSize = 14
 
     ToggleButton.MouseButton1Click:Connect(function()
         State = not State
@@ -156,7 +163,7 @@ function UILibrary.AddLabel(parent, text)
     Label.Font = Enum.Font.SourceSans
     Label.Text = text
     Label.TextColor3 = Color3.fromRGB(255, 255, 255)
-    Label.TextSize = 18
+    Label.TextSize = 14
 end
 
 function UILibrary.AddDropdown(parent, text, options, callback)
@@ -175,27 +182,26 @@ function UILibrary.AddDropdown(parent, text, options, callback)
     DropButton.Font = Enum.Font.SourceSans
     DropButton.Text = text
     DropButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    DropButton.TextSize = 18
+    DropButton.TextSize = 14
 
     OptionFrame.Parent = Dropdown
     OptionFrame.Position = UDim2.new(0, 0, 1, 0)
     OptionFrame.Size = UDim2.new(1, 0, 0, #options * 30)
-    OptionFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    OptionFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30) OptionFrame.BackgroundTransparency = 0.5
     OptionFrame.Visible = false
-    OptionFrame.ClipsDescendants = true
 
     Layout.Parent = OptionFrame
     Layout.SortOrder = Enum.SortOrder.LayoutOrder
 
-    for _, option in ipairs(options) do
+    for _, option in pairs(options) do
         local Option = Instance.new("TextButton")
         Option.Parent = OptionFrame
         Option.Size = UDim2.new(1, 0, 0, 30)
         Option.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
         Option.Font = Enum.Font.SourceSans
         Option.Text = option
-Option.TextColor3 = Color3.fromRGB(255, 255, 255)
-        Option.TextSize = 18
+        Option.TextColor3 = Color3.fromRGB(255, 255, 255)
+        Option.TextSize = 14
         Option.MouseButton1Click:Connect(function()
             DropButton.Text = option
             OptionFrame.Visible = false
